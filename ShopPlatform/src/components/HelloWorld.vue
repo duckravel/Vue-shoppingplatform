@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <a href="#" @click.prevent='signout'>登出</a>
+    <!-- <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
       <li>
@@ -79,7 +80,7 @@
           awesome-vue
         </a>
       </li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 
@@ -90,6 +91,19 @@ export default {
     return {
       msg: 'Welcome to Your Vue.js App'
     }
+  },
+  signout(){
+    const api =`${process.env.APIPATH}/logout`;
+      const vm=this;
+
+    //api伺服器
+    //所申請的api path
+    this.$http.get(api).then(Response=>{
+       console.log(Response.data);
+       if (Response.data.success){
+         vm.$router.push('/login');//登入成功就會去首頁
+       }
+    })
   }
 }
 </script>

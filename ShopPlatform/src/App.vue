@@ -2,6 +2,7 @@
   <div id="app">
     <img src="./assets/logo.png">
     <HelloWorld/>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -17,7 +18,6 @@ export default {
     const api =`${process.env.APIPATH}${process.env.CUSTOMPATH}/products`;
     //api伺服器
     //所申請的api path
-    console.log(process.env.APIPATH,process.env.CUSTOMPATH);
     this.$http.get(api).then(Response=>{
        console.log(Response.data);
     })
@@ -25,7 +25,7 @@ export default {
 }
 </script>
 
-<style lang ="scss">
-@import './assets/all'
+<style>
+/* @import './assets/all' */
 
 </style>
