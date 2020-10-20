@@ -1,6 +1,6 @@
-# shopping
+# shop_project
 
-> A platform for managing shopping data
+> A shopplatform use vue framework
 
 ## Build Setup
 
