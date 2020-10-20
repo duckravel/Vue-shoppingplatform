@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+    <a href="#" @click.prevent="signout">登出</a>
+    <img src="../assets/logo.png">
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
@@ -89,6 +91,19 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  methods:{
+    signout(){
+      const api = `${process.env.APIPATH}/logout`;
+      const vm=this;
+      this.$http.post(api).then((response) => {
+        console.log(response);
+        if (response.data.success){
+          console.log('jump');
+          vm.$router.push('/login');
+        }
+        })
     }
   }
 }
