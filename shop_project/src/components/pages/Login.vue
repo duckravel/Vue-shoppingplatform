@@ -33,14 +33,16 @@ export default {
       const api = `${process.env.APIPATH}/admin/signin`;
       const vm=this;
       this.$http.post(api,vm.user).then((response) => {
-        console.log(response);
         if (response.data.success){
           //這一段式安全性驗證的作法，先從後端取得cookie,再送cookie中的token給後端，可以避免跨域問題
           const token = response.data.token;
           const expired = response.data.expired;
           document.cookie=`hexToken=${token};expires=${new Date(expired)};`;
           //存好cookie後就可以進行轉址,轉址在created階段要先送token給後端進行驗證已取得資料
-          vm.$router.push('/dashboard');
+          vm.$router.push('/admin');
+          // next({path:'/dashboard'})
+        }else{
+          vm.$router.push('/login');
         }
         })
     }

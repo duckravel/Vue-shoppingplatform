@@ -8,12 +8,12 @@
 <script>
 export default {
   name: 'App',
-  created() {
-    var apipath = process.env.APIPATH;
-    var custom = process.env.CUSTOMPATH;
-    const api = `${apipath}/api/${custom}/products/all`;
-    this.$http.get(api).then((response) => {})
-  },
+  // created() {
+  //   var apipath = process.env.APIPATH;
+  //   var custom = process.env.CUSTOMPATH;
+  //   const api = `${apipath}/api/${custom}/products/all`;
+  //   this.$http.get(api).then((response) => {})
+  // },
 }
 </script>
 

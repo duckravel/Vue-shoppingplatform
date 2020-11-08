@@ -5,6 +5,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import App from './App'
 import router from './router'
+import 'bootstrap';
 
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
@@ -22,7 +23,6 @@ router.beforeEach((to,from,next)=>{
     const api = `${process.env.APIPATH}/api/user/check`;
       const vm=this;
       axios.post(api).then((response) => {
-        console.log(response);
         if (response.data.success){
           //這一段式安全性驗證的作法，先從後端取得cookie,再送cookie中的token給後端，可以避免跨域問題
           const token = response.data.token;
