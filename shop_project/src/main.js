@@ -5,9 +5,15 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import App from './App'
 import router from './router'
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css'
 import 'bootstrap';
+import './bus';
+import currencyfilter from './filter/currency';
 
-Vue.use(VueAxios, axios)
+Vue.use(VueAxios, axios);
+Vue.component('Loading',Loading); //全域啟用
+Vue.filter('currency',currencyfilter);//全域啟用
 Vue.config.productionTip = false
 axios.defaults.withCredentials = true;
 /* eslint-disable no-new */
@@ -24,11 +30,7 @@ router.beforeEach((to,from,next)=>{
       const vm=this;
       axios.post(api).then((response) => {
         if (response.data.success){
-          //這一段式安全性驗證的作法，先從後端取得cookie,再送cookie中的token給後端，可以避免跨域問題
-          const token = response.data.token;
-          const expired = response.data.expired;
-          document.cookie=`hexToken=${token};expires=${new Date(expired)};`;
-          //存好cookie後就可以進行轉址,轉址在created階段要先送token給後端進行驗證已取得資料
+          next();
         }else{
           next({path:'/login'});
         }

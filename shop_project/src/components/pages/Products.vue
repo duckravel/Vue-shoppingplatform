@@ -1,7 +1,8 @@
 <template>
     <div>
+        <loading :active.sync='isLoading'></loading>
         <div class="text-right">
-            <div class="btn btn-outline-dark btn-sm" @click="openModal(true)" >建立新產品</div>
+            <div class="btn btn-primary btn-sm" @click="openModal(true)" >建立新產品</div>
         </div>
         <table class="table mt-4">
             <thead>
@@ -11,27 +12,47 @@
                     <th width='120' class="text-right">原價格</th>
                     <th width='120' class="text-right">目前價格</th>
                     <th width='120' >啟用狀態</th>
-                    <th width='80' >編輯</th>
+                    <th width='160' >編輯</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for='(item,key) in products' :key='key'>
                     <td>{{item.category}}</td>
                     <td>{{item.title}}</td>
-                    <td class="text-right">{{item.origin_price}}</td>
-                    <td class="text-right">{{item.price}}</td>
+                    <td class="text-right">{{item.origin_price | currency}}</td>
+                    <td class="text-right">{{item.price | currency}}</td>
                     <td>
                         <span v-if='item.is_enabled' class="text-success">啟用</span>
                         <span v-else class="text-danger">未啟用</span>
                     </td>
                     <td>
                         <div class="btn btn-outline-primary btn-sm" @click="openModal(false,item)">編輯</div>
+                        <div class="btn btn-outline-danger btn-sm" @click.prevent="deleteFile(item)">刪除</div>
                     </td>
                     
                 </tr>
 
             </tbody>
         </table>
+        <nav aria-label="Page navigation example">
+        <ul class="pagination" v-if="pagination.total_pages">
+        <li class="page-item" :class="{'disabled':!pagination.has_pre}" @click.prevent="getProducts(pagination.current_page-1)">
+            <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item" v-for="(page,index) in pagination.total_pages" :key='index' ><a class="page-link" href="#"
+        :class="{'active':page==pagination.current_page}" @click.prevent="getProducts(page)"
+        >{{page}}</a></li>
+        <!-- <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li> -->
+        <li class="page-item" :class="{'disabled':!pagination.has_next}">
+            <a class="page-link" href="#" aria-label="Next" @click.prevent="getProducts(pagination.current_page+1)">
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        </ul>
+        </nav>
         <!-- Modal -->
         <div class="modal fade" id="ProductModal" tabindex="-1" role="dialog" aria-labelledby="ProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -152,12 +173,16 @@ export default {
         }
     },
     methods:{
-        getProducts(){
+        getProducts(page=1){
             const vm=this;
-            const api = `${apipath}/api/${custom}/products/all`;
+            const api = `${apipath}/api/${custom}/admin/products?page=${page}`;
+            vm.isLoading=true;
             this.$http.get(api).then((response) => {
-                vm.products = response.data.products
-                console.log(response.data)});
+                vm.products = response.data.products;
+                if (response.data.pagination){vm.pagination=response.data.pagination;}
+                vm.isLoading=false;
+                // console.log(response)
+                });
         },
         openModal(isNew,item){
             if (isNew){this.tempProduct={};this.isNew=true;}
@@ -168,17 +193,19 @@ export default {
         },
         updateProduct(){
             const vm=this;
-            let api = `${apipath}/api/${custom}/admin/products`;
+            let api = `${apipath}/api/${custom}/admin/product`;
             let httpMethod='post'
             if (!vm.isNew){
-                api = `${apipath}/api/${custom}/admin/products/${vm.tempProduct.id}`;
+                api = `${apipath}/api/${custom}/admin/product/${vm.tempProduct.id}`;
                 httpMethod='put';
             }
+            console.log(api);
             this.$http[httpMethod](api,{data:vm.tempProduct}).then((response) => {
                 console.log(response.data);
-                if (response.data.success){$('#productMoal').modal('hide');
-                vm.getProducts();}
-                else{$('#productMoal').modal('hide')    
+                if (response.data.success){
+                    $('#ProductModal').modal('hide');
+                    vm.getProducts();}
+                else{$('#ProductModal').modal('hide');
                 console.log('新增失敗');
                 }
             });
@@ -186,20 +213,39 @@ export default {
         uploadFile(){
             const uploadFile = this.$refs.files.files[0];
             const vm=this;
-            const url=`${apipath}/api/${custom}/admin/upload`;
             const formData=new FormData();
             formData.append('file-to-upload',uploadFile);
+            const url=`${apipath}/api/${custom}/admin/upload`;
+            vm.status.fileUploading=true;
             this.$http.post(url,formData,{
                 header:{
                     'Content-Type':'multipart/form-data'
-                }
+                },
             }).then(response=>{
-                console.log(response.data);
-                vm.$set(vm.tempProduct,'imgUrl',response.data.imgUrl);
+                vm.status.fileUploading=false;
+                if(response.data.success){
+                    vm.$set(vm.tempProduct,'imageUrl',response.data.imageUrl);
+                }else{
+                    this.$bus.$emit('messsage:push',response.data.message,'danger');
+                }
+                
                 });
+        },
+        deleteFile(item){
+            let api = `${apipath}/api/${custom}/admin/product/${item.id}`;
+            this.$http.delete(api).then(
+                (response)=>{
+                    if(response.data.success){
+                        this.getProducts();
+                    }
+                }
+            )
+            
         }
+
     },
     created(){
-        this.getProducts()},
+        this.getProducts();
+        },
 }
 </script>

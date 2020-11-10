@@ -39,8 +39,7 @@ export default {
           const expired = response.data.expired;
           document.cookie=`hexToken=${token};expires=${new Date(expired)};`;
           //存好cookie後就可以進行轉址,轉址在created階段要先送token給後端進行驗證已取得資料
-          vm.$router.push('/admin');
-          // next({path:'/dashboard'})
+          vm.$router.push('/admin/products');
         }else{
           vm.$router.push('/login');
         }
