@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VeeValidate from 'vee-validate'
+import zhTW from 'vee-validate/dist/locale/zh_TW'
+import VueI18n from 'vue-i18n'
 import App from './App'
 import router from './router'
 import Loading from 'vue-loading-overlay';
@@ -10,14 +13,28 @@ import 'vue-loading-overlay/dist/vue-loading.css'
 import 'bootstrap';
 import './bus';
 import currencyfilter from './filter/currency';
+import date from './filter/date';
 
+Vue.use(VueI18n)
 Vue.use(VueAxios, axios);
+const i18n = new VueI18n({
+  locale: 'zhTW'
+});
+Vue.use(VeeValidate,
+  {
+    events: 'input|blur', 
+    i18n,
+    dictionary: {
+      zhTW
+}});
 Vue.component('Loading',Loading); //全域啟用
 Vue.filter('currency',currencyfilter);//全域啟用
+Vue.filter('date',date);//全域啟用
 Vue.config.productionTip = false
 axios.defaults.withCredentials = true;
 /* eslint-disable no-new */
 new Vue({
+  i18n,
   el: '#app',
   router,
   components: { App },
